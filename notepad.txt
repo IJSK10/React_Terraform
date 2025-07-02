@@ -1,0 +1,6 @@
+npm run build
+aws s3 ls
+aws s3 sync dist/ s3://YOUR_UNIQUE_BUCKET_NAME
+
+
+kms

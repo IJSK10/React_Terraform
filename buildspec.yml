@@ -1,0 +1,25 @@
+# buildspec.yml
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - echo Installing dependencies...
+      - npm install
+
+  build:
+    commands:
+      - echo Building the static site...
+      - npm run build
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - if [ -n "$CLOUDFRONT_ID" ]; then aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_ID --paths "/*"; fi
+
+artifacts:
+  base-directory: dist
+  files:
+    - '**/*'
