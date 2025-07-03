@@ -1,0 +1,13 @@
+# deploy.yml
+version: 0.2
+
+phases:
+  build:
+    commands:
+      # This command syncs the artifact from the previous stage to your S3 bucket
+      - echo "Deploying to S3 bucket $S3_BUCKET_NAME..."
+      - aws s3 sync . s3://$S3_BUCKET_NAME --delete
+      
+      # This command invalidates the CloudFront cache
+      - echo "Invalidating CloudFront cache for distribution $CLOUDFRONT_ID..."
+      - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_ID --paths "/*"
