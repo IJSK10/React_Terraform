@@ -6,15 +6,22 @@ phases:
     runtime-versions:
       nodejs: 20
     commands:
-      - echo "Installing dependencies..."
+      - echo Installing dependencies...
       - npm install
+
   build:
     commands:
-      - echo "Building the static site..."
+      - echo Building the static site...
       - npm run build
 
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      # This command only runs during the "InvalidateCache" stage
+      - if [ -n "$CLOUDFRONT_ID" ]; then aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_ID --paths "/*"; fi
+
 artifacts:
-  # The output of this stage is everything in the 'dist' folder
+  # This defines the output for the "Build" stage
   base-directory: dist
   files:
     - '**/*'
