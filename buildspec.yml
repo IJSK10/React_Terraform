@@ -2,12 +2,19 @@
 version: 0.2
 
 phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - echo "Installing dependencies..."
+      - npm install
   build:
     commands:
-      # Sync the artifact from the build stage to our deployment S3 bucket
-      - echo "Uploading deployment files to S3..."
-      - aws s3 sync . s3://$S3_DEPLOY_BUCKET --delete
-      
-      # Tell the Auto Scaling Group to refresh its instances
-      - echo "Starting instance refresh for ASG $ASG_NAME..."
-      - aws autoscaling start-instance-refresh --auto-scaling-group-name $ASG_NAME
+      - echo "Building the static site..."
+      - npm run build
+
+artifacts:
+  # The output of this stage is everything in the 'dist' folder
+  base-directory: dist
+  files:
+    - '**/*'

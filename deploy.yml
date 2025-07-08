@@ -4,10 +4,10 @@ version: 0.2
 phases:
   build:
     commands:
-      # This command syncs the artifact from the previous stage to your S3 bucket
-      - echo "Deploying to S3 bucket $S3_BUCKET_NAME..."
-      - aws s3 sync . s3://$S3_BUCKET_NAME --delete
+      # Sync the artifact from the build stage to the deployment S3 bucket
+      - echo "Uploading deployment files to S3 bucket $S3_DEPLOY_BUCKET..."
+      - aws s3 sync . s3://$S3_DEPLOY_BUCKET --delete
       
-      # This command invalidates the CloudFront cache
-      - echo "Invalidating CloudFront cache for distribution $CLOUDFRONT_ID..."
-      - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_ID --paths "/*"
+      # Tell the Auto Scaling Group to refresh its instances
+      - echo "Starting instance refresh for ASG $ASG_NAME..."
+      - aws autoscaling start-instance-refresh --auto-scaling-group-name $ASG_NAME
