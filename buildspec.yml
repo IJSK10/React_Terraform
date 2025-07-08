@@ -2,26 +2,12 @@
 version: 0.2
 
 phases:
-  install:
-    runtime-versions:
-      nodejs: 20
-    commands:
-      - echo Installing dependencies...
-      - npm install
-
   build:
     commands:
-      - echo Building the static site...
-      - npm run build
-
-  post_build:
-    commands:
-      - echo Build completed on `date`
-      # This command only runs during the "InvalidateCache" stage
-      - if [ -n "$CLOUDFRONT_ID" ]; then aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_ID --paths "/*"; fi
-
-artifacts:
-  # This defines the output for the "Build" stage
-  base-directory: dist
-  files:
-    - '**/*'
+      # Sync the artifact from the build stage to our deployment S3 bucket
+      - echo "Uploading deployment files to S3..."
+      - aws s3 sync . s3://$S3_DEPLOY_BUCKET --delete
+      
+      # Tell the Auto Scaling Group to refresh its instances
+      - echo "Starting instance refresh for ASG $ASG_NAME..."
+      - aws autoscaling start-instance-refresh --auto-scaling-group-name $ASG_NAME
