@@ -2,7 +2,7 @@ import {type Student } from "../types";
 
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const getStudents = async (): Promise<Student[]> => {
   try {
