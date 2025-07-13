@@ -44,7 +44,7 @@ export const AllStudentsPage:React.FC = () => {
 
     return (
         <div className="p-8">
-            <h1 className="text-3xl font-bold text-white mb-6 text-center">All Students</h1>
+            <h1 className="text-3xl font-bold text-white mb-6 text-center">Students Details</h1>
             <div className="space-y-4 max-w-2xl mx-auto">
                 {students.map(student => (
                     <StudentCard key={student.id} student={student} />
