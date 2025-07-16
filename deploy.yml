@@ -12,7 +12,7 @@ phases:
     commands:
       # Download the EXACT version of the artifact using the --version-id flag
       - echo "Downloading approved artifact version from artifacts bucket..."
-      - aws s3api get-object --bucket your-s3-artifacts-bucket --key frontend/deployment-package.zip --version-id "${VERSION_ID}" approved-package.zip
+      - aws s3api get-object --bucket $ARTIFACTS_BUCKET --key frontend/deployment-package.zip --version-id "${VERSION_ID}" approved-package.zip
       - unzip approved-package.zip -d ./unzipped-build
   
   post_build:

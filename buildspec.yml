@@ -19,7 +19,7 @@ phases:
 
       # Upload the pacakge to versioned artifacts bucket
       - echo "Uploading artifact to S3..."
-      - UPLOAD_OUTPUT=$(aws s3api put-object --bucket your-s3-artifacts-bucket --key frontend/deployment-package.zip --body ../deployment-package.zip)
+      - UPLOAD_OUTPUT=$(aws s3api put-object --bucket $ARTIFACTS_BUCKET --key frontend/deployment-package.zip --body ../deployment-package.zip)
 
       # Extract the unqiue version ID
       - VERSION_ID=$(echo $UPLOAD_OUTPUT | jq -r .VersionId)
