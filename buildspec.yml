@@ -1,4 +1,4 @@
-# buildspec.yml
+# buildspec_deploy.yml
 version: 0.2
 
 phases:
