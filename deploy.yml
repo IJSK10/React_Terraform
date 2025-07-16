@@ -2,12 +2,22 @@
 version: 0.2
 
 phases:
+  pre_build:
+    commands:
+      - echo "Fetching the approved Version ID from SSM..."
+      - VERSION_ID=$(aws ssm get-parameter --name "/MyApp/Frontend/LatestVersionID" --query "Parameter.Value" --output text)
+      - echo "Approved Version ID is: ${VERSION_ID}"
+
   build:
     commands:
-      # THE FIX: Sync from the specific directory for the build artifact
-      - echo "Deploying to S3 bucket $S3_DEPLOY_BUCKET..."
-      - aws s3 sync $CODEBUILD_SRC_DIR_build_output s3://$S3_DEPLOY_BUCKET --delete
-      
-      # This command remains the same
-      - echo "Starting instance refresh for ASG $ASG_NAME..."
-      - aws autoscaling start-instance-refresh --auto-scaling-group-name $ASG_NAME
+      # Download the EXACT version of the artifact using the --version-id flag
+      - echo "Downloading approved artifact version from artifacts bucket..."
+      - aws s3api get-object --bucket your-s3-artifacts-bucket --key frontend/deployment-package.zip --version-id "${VERSION_ID}" approved-package.zip
+      - unzip approved-package.zip -d ./unzipped-build
+  
+  post_build:
+    commands:
+      # Sync the unzipped contents to your FINAL website hosting bucket
+      - echo "Syncing files to the public S3 website bucket..."
+      - aws s3 sync ./unzipped-build/ s3://$S3_DEPLOY_BUCKET/ --delete
+      - echo "Frontend deployment complete."

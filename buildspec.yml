@@ -12,6 +12,21 @@ phases:
     commands:
       - echo "Building the static site..."
       - npm run build
+  post_build:
+    commands:
+      - echo "Creating deployment package from 'dist' directory..."
+      - cd dist/ && zip -r ../deployment-package.zip .
+
+      # Upload the pacakge to versioned artifacts bucket
+      - echo "Uploading artifact to S3..."
+      - UPLOAD_OUTPUT=$(aws s3api put-object --bucket your-s3-artifacts-bucket --key frontend/deployment-package.zip --body ../deployment-package.zip)
+
+      # Extract the unqiue version ID
+      - VERSION_ID=$(echo $UPLOAD_OUTPUT | jq -r .VersionId)
+      - echo "New Version ID is ${VERSION_ID}"
+
+      # New: Save the VersionId to SSM
+      - aws ssm put-parameter --name "/MyApp/Frontend/LatestVersionID" --value "${VERSION_ID}" --type "String" --overwrite
 
 artifacts:
   # The output of this stage is everything in the 'dist' folder
