@@ -5,14 +5,14 @@ phases:
   pre_build:
     commands:
       - echo "Fetching the approved Version ID from SSM..."
-      - VERSION_ID=$(aws ssm get-parameter --name "/MyApp/Frontend/LatestVersionID" --query "Parameter.Value" --output text)
+      - 'VERSION_ID=$(aws ssm get-parameter --name "/MyApp/Frontend/LatestVersionID" --query "Parameter.Value" --output text)'
       - echo "Approved Version ID is: ${VERSION_ID}"
 
   build:
     commands:
       # Download the EXACT version of the artifact using the --version-id flag
       - echo "Downloading approved artifact version from artifacts bucket..."
-      - aws s3api get-object --bucket $ARTIFACTS_BUCKET --key frontend/deployment-package.zip --version-id "${VERSION_ID}" approved-package.zip
+      - 'aws s3api get-object --bucket $ARTIFACTS_BUCKET --key frontend/deployment-package.zip --version-id "${VERSION_ID}" approved-package.zip'
       - unzip approved-package.zip -d ./unzipped-build
   
   post_build:
