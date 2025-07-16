@@ -6,7 +6,7 @@ phases:
     commands:
       - echo "Fetching the approved Version ID from SSM..."
       - 'VERSION_ID=$(aws ssm get-parameter --name "/MyApp/Frontend/LatestVersionID" --query "Parameter.Value" --output text)'
-      - echo "Approved Version ID is: ${VERSION_ID}"
+      - 'echo "Approved Version ID is: ${VERSION_ID}"'
 
   build:
     commands:
