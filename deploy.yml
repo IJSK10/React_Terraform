@@ -5,7 +5,8 @@ phases:
   pre_build:
     commands:
       - echo "Fetching the approved Version ID from SSM..."
-      - 'VERSION_ID=$(aws ssm get-parameter --name "/MyApp/Frontend/LatestVersionID" --query "Parameter.Value" --output text)'
+      - 'DEPLOYMENT_INFO=$(aws ssm get-parameter --name "/MyApp/Frontend/LatestVersionID" --query "Parameter.Value" --output text)'
+      - 'VERSION_ID=$(echo $DEPLOYMENT_INFO | jq -r .s3VersionId)'
       - 'echo "Approved Version ID is: ${VERSION_ID}"'
 
   build:
@@ -14,6 +15,8 @@ phases:
       - echo "Downloading approved artifact version from artifacts bucket..."
       - 'aws s3api get-object --bucket $ARTIFACTS_BUCKET --key frontend/deployment-package.zip --version-id "${VERSION_ID}" approved-package.zip'
       - unzip approved-package.zip -d ./unzipped-build
+      - 'echo "Starting instance refresh on frontend ASG $ASG_NAME"'
+      - 'aws autoscaling start-instance-refresh --auto-scaling-group-name "$ASG_NAME"'
   
   post_build:
     commands:
@@ -21,3 +24,4 @@ phases:
       - echo "Syncing files to the public S3 website bucket..."
       - aws s3 sync ./unzipped-build/ s3://$S3_DEPLOY_BUCKET/ --delete
       - echo "Frontend deployment complete."
+      

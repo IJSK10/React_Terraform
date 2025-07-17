@@ -24,9 +24,22 @@ phases:
       # Extract the unqiue version ID
       - VERSION_ID=$(echo $UPLOAD_OUTPUT | jq -r .VersionId)
       - echo "New Version ID is ${VERSION_ID}"
+      - GIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - COMMIT_MSG=$(git log -1 --pretty=%B | tr -d '\n' | jq -sR)
+
+      - |
+        PARAM_VALUE=$(cat <<EOF
+        {
+          "s3VersionId": "$VERSION_ID",
+          "commitHash": "$GIT_HASH",
+          "commitMessage": $COMMIT_MSG
+        }
+        EOF
+        )
 
       # New: Save the VersionId to SSM
-      - aws ssm put-parameter --name "/MyApp/Frontend/LatestVersionID" --value "${VERSION_ID}" --type "String" --overwrite
+      - echo "Storing deployment info in SSM: ${PARAM_VALUE}"
+      - aws ssm put-parameter --name "/MyApp/Frontend/LatestVersionID" --value ${PARAM_VALUE} --type "String" --overwrite
 
 artifacts:
   # The output of this stage is everything in the 'dist' folder
