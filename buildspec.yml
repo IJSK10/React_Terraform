@@ -26,8 +26,10 @@ phases:
       # Extract the unqiue version ID
       - VERSION_ID=$(echo $UPLOAD_OUTPUT | jq -r .VersionId)
       - echo "New Version ID is ${VERSION_ID}"
+      - cd $CODEBUILD_SRC_DIR
       - GIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - COMMIT_MSG=$(git log -1 --pretty=%B | tr -d '\n' | jq -sR)
+      - echo "commit msg is ${COMMIT_MSG}"
 
       - |
         PARAM_VALUE=$(cat <<EOF
