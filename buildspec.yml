@@ -39,7 +39,7 @@ phases:
 
       # New: Save the VersionId to SSM
       - 'echo "Storing deployment info in SSM: ${PARAM_VALUE}"'
-      - 'aws ssm put-parameter --name "/MyApp/Frontend/LatestVersionID" --value ${PARAM_VALUE} --type "String" --overwrite'
+      - 'aws ssm put-parameter --name "/MyApp/Frontend/LatestVersionID" --value "${PARAM_VALUE}" --type "String" --overwrite'
 
 artifacts:
   # The output of this stage is everything in the 'dist' folder
