@@ -6,7 +6,8 @@ phases:
     runtime-versions:
       nodejs: 20
     commands:
-      - yum install -y git
+      - apt-get update
+      - apt-get install -y git
       - echo "Installing dependencies..."
       - npm install
   build:
