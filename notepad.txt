@@ -4,3 +4,5 @@ aws s3 sync dist/ s3://YOUR_UNIQUE_BUCKET_NAME
 
 
 kms
+
+Your username
